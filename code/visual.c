@@ -1,9 +1,6 @@
-#include <cairo.h>
-#include <gtk/gtk.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/time.h>
+#include "ILS.h"
+
+
 
 struct timeval start;
 struct timeval stop;
@@ -15,6 +12,7 @@ struct {
 	float scal_x;
 	float scal_y;
 } glob;
+
 
 double DegreesToRadians( double degrees )
 {
@@ -179,7 +177,7 @@ static gboolean time_handler(GtkWidget *widget)
 	return TRUE;
 }
 
-int main(int argc, char *argv[])
+void *visual(void* param)
 {
 	GtkWidget *window;
 	GtkWidget *darea;  
@@ -190,8 +188,8 @@ int main(int argc, char *argv[])
 	glob.alt = (300-52.4-80)/glob.scal_y;
 	glob.land = (300-52.4-0)/glob.scal_y;
 	
-
-	gtk_init(&argc, &argv);
+	ArgCV *args = (ArgCV*) param;
+	gtk_init(&(args->argc), &(args->argv));
 
 	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 
@@ -212,5 +210,5 @@ int main(int argc, char *argv[])
 
 	gtk_main();
 
-	return 0;
+
 }

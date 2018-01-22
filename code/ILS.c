@@ -19,19 +19,20 @@ bool visual_flag_att=false;
 
 //*********** ILS_data_pos *****************
 // 
-void ILS_data_pos(int* pos_p, int* pos_r){
+void ILS_data_pos(int* pos_a, int* pos_r){
 
 	float vertical_sep	=0;
 	float horizontal_sep=0;
 
 	float a_glide_slope=0;
+	float a_deviation=0;
 
 
 	// Calculations ILS obtaing angles------
 
 
 	// Glide Slope
-	a_glide_slope = atan2(pos_r[2]-pos_a[2],sqrt(pow(pos_r[0]-pos_a[0])+pow(pos_r[1]-pos_a[1])));
+	a_glide_slope = atan2(pos_r[2]-pos_a[2],sqrt(pow(pos_r[0]-pos_a[0],2)+pow(pos_r[1]-pos_a[1],2)));
 	a_deviation = atan2(pos_r[0]-pos_a[0],pos_r[1]-pos_a[1]);
 
 	// Deviations ILS make responsa as in ILS
@@ -40,17 +41,18 @@ void ILS_data_pos(int* pos_p, int* pos_r){
 
 	// Set Flag for Visual
 
-	visual_flag=true;
+	visual_flag_pos=true;
 
 	return;
 }
 
 //*********** ILS_data_att *****************
 // 
-void ILS_data_att(att_p, att_r){
+void ILS_data_att(int* att_p,int* att_r)
+{
 
 	visual_flag_att=true;
-	return
+	return;
 }
 
 
@@ -81,7 +83,7 @@ int main(int argc, char *argv[]) {
 	char data[32];
 	int id=0;
 
-	int pos_p[3], att_p[3];
+	int pos_a[3], att_a[3];
 	int pos_r[3], att_r[3];
 
 	//Replace this by something else!!!
@@ -94,7 +96,9 @@ int main(int argc, char *argv[]) {
 	att_r[1]=0;
 	att_r[2]=0;
 
-	printf( "using port #%d\n", portno );
+
+
+	// Initiating socket connection
    
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
 	if (sockfd < 0)
@@ -109,6 +113,19 @@ int main(int argc, char *argv[]) {
 	error( const_cast<char *>( "ERROR on binding" ) );
 	listen(sockfd,5);
 	clilen = sizeof(cli_addr);
+
+
+	//Initiating threads
+
+	/*Visual thread*/
+ 	pthread_t t1;
+ 	ArgCV args;
+    args.argc = argc;
+    args.argv = argv;
+    pthread_create(&t1, NULL, visual, &args);
+
+
+
  
 	//--- infinite wait on a connection ---
 	while ( 1 ) {
@@ -126,14 +143,14 @@ int main(int argc, char *argv[]) {
 			// scan data from attitude
 			if (data[0]==ID_ATT)
 			{
-				sscanf(data, "%d %d %d %d %d %d", &att_p[0], &att_p[1], &att_p[2]);
-				ILS_data_att(att_p, att_r);
+				sscanf(data, "%d %d %d", &att_a[0], &att_a[1], &att_a[2]);
+				ILS_data_att(att_a, att_r);
 			}
 			// scan data from position
 			else if (data[0]==ID_POS)
 			{
-				sscanf(data, "%d %d %d %d %d %d", &pos_p[0], &pos_p[1], &pos_p[2]);
-				ILS_data_pos(pos_p, pos_r);
+				sscanf(data, "%d %d %d", &pos_a[0], &pos_a[1], &pos_a[2]);
+				ILS_data_pos(pos_a, pos_r);
 			}
 
 

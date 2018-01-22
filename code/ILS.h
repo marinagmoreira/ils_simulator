@@ -3,6 +3,8 @@
 
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <sys/time.h>
+
 #include <netinet/in.h>
 #include <netdb.h>
 #include <string.h>
@@ -12,11 +14,26 @@
 #include <math.h>
 #include <pthread.h>
 
+
+// For visual
+#include <cairo.h>
+#include <gtk/gtk.h>
+
+
+
 #define PI 		3.14159265
 #define ID_ATT	1
 #define ID_POS	2
 
 
 
-extern bool visual_flag_pos;
-extern bool visual_flag_att;
+//extern bool visual_flag_pos;
+//extern bool visual_flag_att;
+
+typedef struct ArgCV {
+    int argc;
+    char **argv;
+};
+
+
+void *visual(void* param);
