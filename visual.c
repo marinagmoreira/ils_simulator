@@ -16,7 +16,26 @@ struct {
 	float scal_y;
 } glob;
 
+double DegreesToRadians( double degrees )
+{
+    return((double)((double)degrees * ( (double)3.1415/(double)180.0 )));
+}
 
+void Rotate( cairo_surface_t *image, int degrees, cairo_t *cr)
+{
+    int w, h;
+
+    cr = cairo_create(image);
+    w = cairo_image_surface_get_width (image);
+    h = cairo_image_surface_get_height (image);
+    cairo_set_source_surface (cr, image, 1200, 0);
+
+    //cairo_translate(cr, w/2.0, h/2.0);
+    //cairo_rotate(cr, DegreesToRadians( degrees ));
+    //cairo_translate(cr, - w/2.0, -h/2.0);
+
+    cairo_paint (cr);
+}
 
 void do_drawing(cairo_t *cr, int w,
 	int h, cairo_operator_t op)
@@ -24,7 +43,7 @@ void do_drawing(cairo_t *cr, int w,
 	
 	cairo_save(cr);
 	cairo_surface_t *image2;
-	image2 = cairo_image_surface_create_from_png ("sky.png");
+	image2 = cairo_image_surface_create_from_png ("images/sky.png");
 	cairo_set_source_surface (cr, image2, 0,0);
 	cairo_rectangle (cr, 0,0,1200,300);
 	cairo_clip (cr);
@@ -34,7 +53,7 @@ void do_drawing(cairo_t *cr, int w,
 
 	cairo_save(cr);
 	cairo_surface_t *image3;
-	image3 = cairo_image_surface_create_from_png ("forrest2.png");
+	image3 = cairo_image_surface_create_from_png ("images/forrest2.png");
 	cairo_rectangle (cr, 0,0,1200,300);
 	cairo_clip (cr);
 	cairo_new_path (cr);
@@ -45,14 +64,48 @@ void do_drawing(cairo_t *cr, int w,
 
 	cairo_save(cr);
 	cairo_surface_t *image4;
-	image4 = cairo_image_surface_create_from_png ("ils2.png");
+	image4 = cairo_image_surface_create_from_png ("images/roda_outside.png");
 	cairo_rectangle (cr, 1200, 0 , 400,400);
 	cairo_clip (cr);
 	cairo_new_path (cr);
-	cairo_scale (cr, 0.65, 0.65);
-	cairo_set_source_surface (cr, image4, 1200/0.65, 0);
+	//cairo_scale (cr, 0, 0.65);
+	cairo_set_source_surface (cr, image4, 1200/1, 0);
 	cairo_paint (cr);
 	cairo_restore(cr);
+
+
+	cairo_save(cr);
+	cairo_surface_t *image5;
+	image5 = cairo_image_surface_create_from_png ("images/roda_heading.png");
+	
+	int ww, hh, degrees = 5;
+   
+    ww = cairo_image_surface_get_width (image5);
+    hh = cairo_image_surface_get_height (image5);
+
+    cairo_translate(cr, w/2.0, h/2.0);
+    cairo_rotate(cr, DegreesToRadians( degrees ));
+    cairo_translate(cr, - w/2.0, -h/2.0);
+
+    cairo_set_source_surface(cr, image5,  0, 0);
+    cairo_paint (cr);
+
+
+	cairo_rectangle (cr, 1200, 0 , 400,400);
+	cairo_clip (cr);
+	cairo_new_path (cr);
+	
+	
+	
+	cairo_restore(cr);
+
+
+
+	
+
+    
+	
+
 
 	cairo_save(cr);
 	cairo_set_line_width(cr, 1); 
@@ -69,7 +122,7 @@ void do_drawing(cairo_t *cr, int w,
 	cairo_rectangle (cr, 0,0,1200,300);
 	cairo_clip (cr);
 	cairo_new_path (cr); 
-	image = cairo_image_surface_create_from_png ("plane.png");
+	image = cairo_image_surface_create_from_png ("images/plane.png");
 	cairo_scale (cr, glob.scal_x, glob.scal_y);
 	printf("pos %f %f\n",glob.x, glob.alt);
 	cairo_set_source_surface (cr, image, glob.x, glob.alt);
@@ -80,6 +133,7 @@ void do_drawing(cairo_t *cr, int w,
 	cairo_surface_destroy (image2);
 	cairo_surface_destroy (image3);
 	cairo_surface_destroy (image4);
+	cairo_surface_destroy (image5);
 
 }
 
